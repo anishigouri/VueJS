@@ -1,8 +1,8 @@
 <template>
-  <div>
-    <h1>{{ titulo }}</h1>
-    <ul>
-      <li :key="foto.titulo" v-for="foto of fotos">
+  <div class='corpo'>
+    <h1 class='centralizado'>{{ titulo }}</h1>
+    <ul class='lista-fotos'>
+      <li class='lista-fotos-item' :key="foto.titulo" v-for="foto of fotos">
         <img :src="foto.url" :alt="foto.titulo" />
       </li>
     </ul>
@@ -16,22 +16,38 @@ export default {
   data() {
     return {
       titulo: 'Alurapic',
-      fotos: [
-        {
-          url: 'https://meusanimais.com.br/wp-content/uploads/2015/05/gato.jpg',
-          titulo: 'Gato'
-        },
-        {
-          url: 'https://meusanimais.com.br/wp-content/uploads/2015/05/gato.jpg',
-          titulo: 'Gatao'
-        }
-      ]
+      fotos: []
     }
+  },
+
+  created() {
+    // - Usado do vueResource
+    let promise = this.$http.get('http://localhost:3000/v1/fotos');
+    promise
+      .then(res => res.json())
+      .then(fotos => this.fotos = fotos, err => console.log(err))
   }
   
 }
 </script>
 
 <style>
+  .corpo {
+    font-family: Helvetica, sans-serif;
+    width: 96%;
+    margin: 0 auto;
 
+  }
+
+  .centralizado {
+    text-align: center;
+  }
+
+  .lista-fotos {
+    list-style: none;
+  }
+
+  .lista-fotos .lista-fotos-item {
+    display: inline-block;
+  }
 </style>

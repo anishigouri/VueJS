@@ -8,6 +8,12 @@
       <li class='lista-fotos-item' :key="foto.titulo" v-for="foto of fotosComFiltro">
         <meu-painel :titulo='foto.titulo'>
           <imagem-responsiva v-meu-transform:scale.animated='1.2' :url='foto.url' :titulo='foto.titulo' />
+          <router-link :to="{ name: 'altera', params: { id: foto._id } }">
+            <meu-botao 
+              tipo='button' 
+              rotulo='Alterar'
+            />
+          </router-link>
           <meu-botao 
             tipo='button' 
             :confirmacao='true'
@@ -27,6 +33,7 @@
 import Painel from '../shared/painel/Painel.vue';
 import ImagemResponsiva from '../shared/imagem-responsiva/ImagemResponsiva.vue';
 import Botao from '../shared/botao/Botao.vue';
+import FotoService from '../../domain/foto/FotoService';
 
 export default {
 
@@ -58,27 +65,33 @@ export default {
 
   methods: {
     remove(foto) {
-      this.$http.delete(`http://localhost:3000/v1/fotos/${foto._id}`)
+
+      this.service.apaga(foto._id)
       .then(() => {
         let indice = this.fotos.indexOf(foto);
         this.fotos.splice(indice, 1);
         this.mensagem = 'Foto removida com sucesso'
-        }, err => {
+      }, err => {
         console.log(err);
-        this.mensagem = 'Nao foi possivel remover a foto';
-      })
-      
-
+        this.mensagem = err.message;
+      });
     }
   },
 
-  created() {
-    // - Usado do vueResource
-    let promise = this.$http.get('http://localhost:3000/v1/fotos');
-    promise
-      .then(res => res.json())
-      .then(fotos => this.fotos = fotos, err => console.log(err))
-  }
+    created() {
+
+      this.service = new FotoService(this.$resource);
+      this.service
+      .lista()
+      .then(fotos => {
+        this.fotos = fotos
+      }, err => {
+        this.mensagem = err.message;
+        console.log(err);
+      });
+      
+    }
+  
   
 }
 </script>
